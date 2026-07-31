@@ -4,10 +4,38 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>First Hour — NASDAQ RTH Profile Tracker</title>
+<script>
+// Applied before the stylesheet paints anything, so the page never flashes
+// the wrong theme on load. Shares the same key as the Daily Summary
+// dashboard (same origin), so the theme choice stays in sync between them.
+(function(){
+  try{
+    var saved = localStorage.getItem('mmtrades-theme');
+    var theme = saved || ((window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light');
+    document.documentElement.setAttribute('data-theme', theme);
+  }catch(e){ /* localStorage unavailable; defaults to light */ }
+})();
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root{
+    --void:#F7F8FA;
+    --surface:#FFFFFF;
+    --surface-raised:#F0F2F5;
+    --grid:#E3E6EA;
+    --text:#14171C;
+    --dim:#6B7280;
+    --dimmer:#9AA1AC;
+    --bull:#1C9A54;
+    --bear:#D1352B;
+    --hod:#B36B00;
+    --lod:#0E8FAE;
+    --synced-c:#9199A3;
+    --stale-c:#B36B00;
+    --radius:3px;
+  }
+  html[data-theme="dark"]{
     --void:#0B0E11;
     --surface:#12161B;
     --surface-raised:#171C22;
@@ -19,13 +47,15 @@
     --bear:#E5484D;
     --hod:#F5A623;
     --lod:#3DDCF7;
-    --radius:3px;
+    --synced-c:#6B7280;
+    --stale-c:#E0A83B;
   }
   *{box-sizing:border-box;}
   html,body{
     margin:0; padding:0; background:var(--void); color:var(--text);
     font-family:'Inter',sans-serif;
     -webkit-font-smoothing:antialiased;
+    transition:background .2s ease, color .2s ease;
   }
   ::selection{ background:var(--hod); color:var(--void); }
   .mono{ font-family:'IBM Plex Mono',monospace; }
@@ -49,6 +79,20 @@
   .meta{ text-align:right; font-size:11px; color:var(--dimmer); }
   .meta .n{ color:var(--text); font-family:'IBM Plex Mono',monospace; font-size:22px; display:block; }
   .meta .lbl{ font-family:'IBM Plex Mono',monospace; letter-spacing:.08em; text-transform:uppercase; }
+  .header-right{ display:flex; align-items:flex-end; gap:14px; }
+  #themeBtn{
+    border:1px solid var(--grid); background:var(--surface); border-radius:var(--radius);
+    width:32px; height:32px; cursor:pointer; font-size:14px; color:var(--text);
+    display:flex; align-items:center; justify-content:center; transition:background .2s ease, border-color .2s ease;
+  }
+  #themeBtn:hover{ background:var(--surface-raised); }
+
+  /* ---------- Sync status (top of page) ---------- */
+  .status-line{ font-size:11px; margin:-18px 0 22px; font-family:'IBM Plex Mono',monospace; }
+  .status-line.loading{ color:var(--dim); }
+  .status-line.synced{ color:var(--synced-c); }
+  .status-line.stale{ color:var(--stale-c); }
+  .status-line.err{ color:var(--bear); }
 
   /* ---------- Signature: Opening Range Timeline ---------- */
   .timeline-card{
@@ -224,9 +268,6 @@ async function render(){
   });
   const maxBar = Math.max(1, ...WINDOW_ORDER.map(w => Math.max(hodByWindow[w], lodByWindow[w])));
 
-  const genDate = generated_at ? new Date(generated_at) : null;
-  const genStr = genDate ? genDate.toLocaleString('en-US', { month:'short', day:'numeric', year:'numeric', hour:'2-digit', minute:'2-digit', timeZoneName:'short' }) : '—';
-
   const up = direction_totals?.UPCLOSE || 0;
   const down = direction_totals?.DOWNCLOSE || 0;
   const both = direction_totals?.BOTHWAYS || 0;
@@ -242,11 +283,16 @@ async function render(){
         <h1>First Hour</h1>
         <p class="sub">Where the day's high &amp; low actually form — vs. the 9:30–10:30 opening range</p>
       </div>
-      <div class="meta">
-        <span class="n">${total_days}</span>
-        <span class="lbl">days logged</span>
+      <div class="header-right">
+        <button id="themeBtn" title="Toggle light/dark theme">🌙</button>
+        <div class="meta">
+          <span class="n">${total_days}</span>
+          <span class="lbl">days logged</span>
+        </div>
       </div>
     </header>
+
+    <div id="statusLine" class="status-line loading">Loading…</div>
 
     <div class="timeline-card">
       <p class="timeline-title">Opening Range Timeline</p>
@@ -354,10 +400,71 @@ async function render(){
     </div>
 
     <footer>
-      Auto-refreshed from Notion · last updated ${genStr}<br/>
+      Auto-refreshed from Notion<br/>
       <a href="https://github.com" target="_blank" rel="noopener">Source data: INDICES LOG</a>
     </footer>
   `;
+
+  setupStatusLine(generated_at);
+  setupThemeToggle();
+}
+
+// ---------- Sync status (top of page), mirrors the Daily Summary dashboard ----------
+// The stats.yml workflow runs on a 15-minute cron (backed up by an external
+// cron-job.org trigger), so anything older than this is flagged as stale.
+const STALE_THRESHOLD_MINUTES = 45;
+
+function setupStatusLine(generatedAt){
+  const statusLine = document.getElementById('statusLine');
+  if (!statusLine) return;
+
+  function update(){
+    if (!generatedAt){
+      statusLine.textContent = "No sync timestamp available.";
+      statusLine.className = "status-line err";
+      return;
+    }
+    const syncedAt = new Date(generatedAt);
+    const minutesAgo = Math.max(0, Math.round((Date.now() - syncedAt.getTime()) / 60000));
+
+    let ago;
+    if (minutesAgo < 1) ago = "just now";
+    else if (minutesAgo < 60) ago = minutesAgo + " min ago";
+    else if (minutesAgo < 1440) ago = Math.round(minutesAgo / 60) + " hr ago";
+    else ago = Math.round(minutesAgo / 1440) + " days ago";
+
+    const isStale = minutesAgo > STALE_THRESHOLD_MINUTES;
+    statusLine.textContent = isStale
+      ? `Last synced ${ago} — this looks stale, the numbers above may be behind. Trigger the sync workflow manually to refresh.`
+      : `Synced ${ago}`;
+    statusLine.className = isStale ? "status-line stale" : "status-line synced";
+  }
+
+  update();
+  setInterval(update, 30000);
+}
+
+// Theme toggle (light/dark). Initial theme is set by the tiny inline script
+// in <head> so the correct theme is applied before first paint (no flash).
+// Shares the 'mmtrades-theme' localStorage key with the Daily Summary
+// dashboard, so switching on one page keeps the other in sync.
+function setupThemeToggle(){
+  const themeBtn = document.getElementById('themeBtn');
+  if (!themeBtn) return;
+
+  function applyIcon(){
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    themeBtn.textContent = isDark ? '☀️' : '🌙';
+  }
+  applyIcon();
+
+  themeBtn.addEventListener('click', () => {
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    const next = isDark ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', next);
+    try{ localStorage.setItem('mmtrades-theme', next); }catch(e){ /* storage may be blocked; theme still applies for this session */ }
+    applyIcon();
+  });
 }
 
 render();
