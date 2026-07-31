@@ -59,7 +59,7 @@
   }
   ::selection{ background:var(--hod); color:var(--void); }
   .mono{ font-family:'IBM Plex Mono',monospace; }
-  .wrap{ max-width:1040px; margin:0 auto; padding:28px 24px 48px; }
+  .wrap{ max-width:1280px; margin:0 auto; padding:28px 24px 48px; }
 
   /* ---------- Header ---------- */
   header{
@@ -172,6 +172,14 @@
   .pct-bar{ display:inline-block; height:6px; background:var(--grid); border-radius:3px; width:70px; margin-left:8px; position:relative; top:-1px; overflow:hidden; }
   .pct-bar i{ display:block; height:100%; border-radius:3px; }
   .highlight-row td{ background:rgba(245,166,35,0.05); }
+
+  /* ---------- Two-column layout: direction table + profile frequency ---------- */
+  .two-col{
+    display:grid; grid-template-columns:1fr 1fr; gap:26px; align-items:start;
+    margin-bottom:26px;
+  }
+  .two-col .cross, .two-col .profiles{ margin-bottom:0; }
+  @media(max-width:820px){ .two-col{ grid-template-columns:1fr; gap:0; } }
 
   /* ---------- Profile frequency ---------- */
   .profiles{
@@ -342,61 +350,67 @@ async function render(){
       </div>
     </div>
 
-    <p class="section-title">By Day Direction</p>
-    <p class="section-desc">Bullish days → look at the LOD column. Bearish days → look at the HOD column.</p>
-    <div class="cross">
-      <table>
-        <thead>
-          <tr>
-            <th>Direction</th>
-            <th class="num">Days</th>
-            <th class="num">HOD in 1st hr</th>
-            <th class="num">LOD in 1st hr</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr class="highlight-row">
-            <td class="dir-name up">UPCLOSE</td>
-            <td class="num">${up}</td>
-            <td class="num">${direction_first_hour_hod?.UPCLOSE || 0} <span class="pct-bar"><i style="width:${pct(direction_first_hour_hod?.UPCLOSE||0, up)}%;background:var(--hod)"></i></span></td>
-            <td class="num">${upLod} <span class="pct-bar"><i style="width:${pct(upLod, up)}%;background:var(--lod)"></i></span></td>
-          </tr>
-          <tr class="highlight-row">
-            <td class="dir-name down">DOWNCLOSE</td>
-            <td class="num">${down}</td>
-            <td class="num">${downHod} <span class="pct-bar"><i style="width:${pct(downHod, down)}%;background:var(--hod)"></i></span></td>
-            <td class="num">${direction_first_hour_lod?.DOWNCLOSE || 0} <span class="pct-bar"><i style="width:${pct(direction_first_hour_lod?.DOWNCLOSE||0, down)}%;background:var(--lod)"></i></span></td>
-          </tr>
-          <tr>
-            <td class="dir-name">BOTHWAYS</td>
-            <td class="num">${both}</td>
-            <td class="num">${direction_first_hour_hod?.BOTHWAYS || 0}</td>
-            <td class="num">${direction_first_hour_lod?.BOTHWAYS || 0}</td>
-          </tr>
-          <tr>
-            <td class="dir-name">SIDEWAYS</td>
-            <td class="num">${side}</td>
-            <td class="num">${direction_first_hour_hod?.SIDEWAYS || 0}</td>
-            <td class="num">${direction_first_hour_lod?.SIDEWAYS || 0}</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+    <div class="two-col">
+      <div class="col-left">
+        <p class="section-title">By Day Direction</p>
+        <p class="section-desc">Bullish days → look at the LOD column. Bearish days → look at the HOD column.</p>
+        <div class="cross">
+          <table>
+            <thead>
+              <tr>
+                <th>Direction</th>
+                <th class="num">Days</th>
+                <th class="num">HOD in 1st hr</th>
+                <th class="num">LOD in 1st hr</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="highlight-row">
+                <td class="dir-name up">UPCLOSE</td>
+                <td class="num">${up}</td>
+                <td class="num">${direction_first_hour_hod?.UPCLOSE || 0} <span class="pct-bar"><i style="width:${pct(direction_first_hour_hod?.UPCLOSE||0, up)}%;background:var(--hod)"></i></span></td>
+                <td class="num">${upLod} <span class="pct-bar"><i style="width:${pct(upLod, up)}%;background:var(--lod)"></i></span></td>
+              </tr>
+              <tr class="highlight-row">
+                <td class="dir-name down">DOWNCLOSE</td>
+                <td class="num">${down}</td>
+                <td class="num">${downHod} <span class="pct-bar"><i style="width:${pct(downHod, down)}%;background:var(--hod)"></i></span></td>
+                <td class="num">${direction_first_hour_lod?.DOWNCLOSE || 0} <span class="pct-bar"><i style="width:${pct(direction_first_hour_lod?.DOWNCLOSE||0, down)}%;background:var(--lod)"></i></span></td>
+              </tr>
+              <tr>
+                <td class="dir-name">BOTHWAYS</td>
+                <td class="num">${both}</td>
+                <td class="num">${direction_first_hour_hod?.BOTHWAYS || 0}</td>
+                <td class="num">${direction_first_hour_lod?.BOTHWAYS || 0}</td>
+              </tr>
+              <tr>
+                <td class="dir-name">SIDEWAYS</td>
+                <td class="num">${side}</td>
+                <td class="num">${direction_first_hour_hod?.SIDEWAYS || 0}</td>
+                <td class="num">${direction_first_hour_lod?.SIDEWAYS || 0}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
 
-    <p class="section-title">RTH Profile Frequency</p>
-    <p class="section-desc">All logged HOD/LOD combinations, most common first. Gold tag = involves the first hour.</p>
-    <div class="profiles">
-      ${Object.entries(profile_counts || {}).sort((a,b) => b[1]-a[1]).map(([name, count]) => {
-        const { hodWindow, lodWindow } = parseProfile(name);
-        const fh = hodWindow === 'AM DR' || lodWindow === 'AM DR';
-        const maxP = Math.max(...Object.values(profile_counts || {1:1}));
-        return `
-          <div class="prow ${fh ? 'fh' : ''}">
-            <div class="pname">${name}${fh ? '<span class="tag">1ST HR</span>' : ''}</div>
-            <div class="track"><i style="width:${(count/maxP*100).toFixed(0)}%"></i></div>
-            <div class="pcount">${count}</div>
-          </div>`;
-      }).join('')}
+      <div class="col-right">
+        <p class="section-title">RTH Profile Frequency</p>
+        <p class="section-desc">All logged HOD/LOD combinations, most common first. Gold tag = involves the first hour.</p>
+        <div class="profiles">
+          ${Object.entries(profile_counts || {}).sort((a,b) => b[1]-a[1]).map(([name, count]) => {
+            const { hodWindow, lodWindow } = parseProfile(name);
+            const fh = hodWindow === 'AM DR' || lodWindow === 'AM DR';
+            const maxP = Math.max(...Object.values(profile_counts || {1:1}));
+            return `
+              <div class="prow ${fh ? 'fh' : ''}">
+                <div class="pname">${name}${fh ? '<span class="tag">1ST HR</span>' : ''}</div>
+                <div class="track"><i style="width:${(count/maxP*100).toFixed(0)}%"></i></div>
+                <div class="pcount">${count}</div>
+              </div>`;
+          }).join('')}
+        </div>
+      </div>
     </div>
 
     <footer>
