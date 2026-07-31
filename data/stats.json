@@ -1,44 +1,44 @@
 {
-  "generated_at": "2026-07-31T00:00:00+00:00",
-  "note": "Starter snapshot computed manually on 2026-07-31. Will be overwritten by the GitHub Action once NOTION_API_KEY is set up.",
-  "total_days": 192,
-  "first_hour_hod_count": 80,
-  "first_hour_lod_count": 101,
-  "both_first_hour_count": 15,
+  "generated_at": "2026-07-31T22:27:47.009705+00:00",
+  "total_days": 197,
+  "first_hour_hod_count": 81,
+  "first_hour_lod_count": 107,
+  "both_first_hour_count": 16,
   "profile_counts": {
-    "[AM DR Low LOD]-[11AM-1PM HOD]": 29,
-    "[AM DR Low LOD]-[3:30-4PM HOD]": 28,
+    "[AM DR Low LOD]-[11AM-1PM HOD]": 30,
+    "[AM DR Low LOD]-[3:30-4PM HOD]": 29,
     "[AM DR High HOD]-[3:30-4PM LOD]": 24,
-    "[AM DR High HOD]-[11AM-1PM LOD]": 23,
+    "[AM DR High HOD]-[11AM-1PM LOD] ": 23,
+    "[AM DR Low LOD]-[1-2 PM HOD] ": 18,
+    "[AM ADR High HOD]-[AM ADR Low LOD]": 16,
+    "[AM DR Low LOD]-[2:50-3:10 HOD]": 14,
     "[AM DR High HOD]-[1-2 PM LOD]": 13,
-    "[AM ADR High HOD]-[AM ADR Low LOD]": 15,
-    "[AM DR Low LOD]-[1-2 PM HOD]": 18,
-    "[AM DR Low LOD]-[2:50-3:10 HOD]": 11,
     "[11AM-1PM LOD]-[3:30-4PM HOD]": 8,
-    "[11AM-1PM HOD]-[3:30-4PM LOD]": 7,
-    "[11AM-1PM HOD]-[11AM-1PM LOD]": 3,
     "[11AM-1PM LOD]-[2:50-3:10 LOD]": 5,
     "[AM DR High HOD]-[2:50-3:10 LOD]": 5,
+    "[11AM-1PM HOD]-[3:30-4PM LOD]": 4,
+    "[11AM-1PM HOD]-[11AM-1PM LOD]": 3,
     "[11AM-1PM HOD]-[1-2PM LOD]": 2,
-    "[1-2 PM LOD]-[3:30-4 PM HOD]": 1,
-    "[11AM-1PM HOD]-[2:50-3:10 LOD]": 0
+    "[2:30-4PM]-[HOD LOD]": 1,
+    "[11AM-1PM HOD]-[2:50-3:10 LOD]": 1,
+    "[1-2 PM LOD]-[3:30-4 PM HOD]": 1
   },
   "direction_totals": {
-    "UPCLOSE": 112,
-    "DOWNCLOSE": 43,
-    "BOTHWAYS": 16,
-    "SIDEWAYS": 19
+    "UPCLOSE": 73,
+    "DOWNCLOSE": 66,
+    "BOTHWAYS": 28,
+    "SIDEWAYS": 31
   },
   "direction_first_hour_hod": {
-    "UPCLOSE": 34,
-    "DOWNCLOSE": 34,
-    "BOTHWAYS": 3,
-    "SIDEWAYS": 9
+    "DOWNCLOSE": 58,
+    "SIDEWAYS": 13,
+    "UPCLOSE": 3,
+    "BOTHWAYS": 7
   },
   "direction_first_hour_lod": {
-    "UPCLOSE": 72,
-    "DOWNCLOSE": 9,
-    "BOTHWAYS": 10,
-    "SIDEWAYS": 10
+    "UPCLOSE": 66,
+    "BOTHWAYS": 14,
+    "DOWNCLOSE": 10,
+    "SIDEWAYS": 18
   }
 }
