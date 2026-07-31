@@ -2,11 +2,17 @@ name: Refresh Trading Stats
 
 on:
   schedule:
-    - cron: "0 6 * * *"   # daily at 06:00 UTC — edit to taste
-  workflow_dispatch: {}     # lets you click "Run workflow" manually anytime
+    - cron: "*/15 * * * *"   # backup only — unreliable on its own, see cron-job.org trigger below
+  workflow_dispatch: {}      # lets cron-job.org (and you, manually) trigger this on demand
 
 permissions:
   contents: write
+
+# Only one sync run at a time — prevents overlapping runs from racing to push
+# and rejecting each other.
+concurrency:
+  group: refresh-trading-stats
+  cancel-in-progress: false
 
 jobs:
   refresh:
@@ -26,10 +32,28 @@ jobs:
         env:
           NOTION_API_KEY: ${{ secrets.NOTION_API_KEY }}
 
-      - name: Commit updated stats.json
+      - name: Commit and push (retries if main moved since checkout)
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add data/stats.json
-          git diff --staged --quiet || git commit -m "Auto-refresh stats [skip ci]"
-          git push
+
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+            exit 0
+          fi
+          git commit -m "Auto-refresh stats [skip ci]"
+
+          for attempt in 1 2 3 4 5; do
+            if git push; then
+              echo "Pushed successfully."
+              exit 0
+            fi
+            echo "Push rejected (attempt $attempt) — main moved since checkout. Rebasing and retrying..."
+            git fetch origin main
+            git rebase origin/main
+            sleep $((attempt * 3))
+          done
+
+          echo "Failed to push after 5 attempts."
+          exit 1
