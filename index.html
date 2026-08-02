@@ -171,6 +171,27 @@
   .dir-name.down{ color:var(--bear); }
   .pct-bar{ display:inline-block; height:6px; background:var(--grid); border-radius:3px; width:70px; margin-left:8px; position:relative; top:-1px; overflow:hidden; }
   .pct-bar i{ display:block; height:100%; border-radius:3px; }
+  .pct-strong{ font-weight:700; }
+  .hod-strong{ color:var(--hod); }
+  .lod-strong{ color:var(--lod); }
+  .notable-lbl{ font-family:'Inter',sans-serif; font-weight:500; font-size:10px; color:var(--dim); text-transform:uppercase; letter-spacing:.02em; margin-top:2px; }
+  .insight-card{
+    background:var(--surface); border:1px solid var(--grid); border-radius:var(--radius);
+    padding:20px 24px; margin-top:16px;
+  }
+  .insight-card h3{ margin:0 0 12px; font-family:'Space Grotesk',sans-serif; font-size:15px; }
+  .insight-row{ display:flex; gap:14px; align-items:baseline; padding:10px 0; border-top:1px solid var(--grid); }
+  .insight-row:first-of-type{ border-top:none; }
+  .insight-row .tag{ font-family:'IBM Plex Mono',monospace; font-weight:600; font-size:12px; padding:2px 8px; border-radius:3px; white-space:nowrap; }
+  .insight-row .tag.up{ color:var(--bull); background:color-mix(in srgb, var(--bull) 12%, transparent); }
+  .insight-row .tag.down{ color:var(--bear); background:color-mix(in srgb, var(--bear) 12%, transparent); }
+  .insight-row p{ margin:0; font-size:13px; line-height:1.55; color:var(--dim); }
+  .insight-row p b{ color:var(--text); }
+  .insight-row .breakdown{ margin-top:6px; display:flex; flex-wrap:wrap; gap:6px; }
+  .insight-row .breakdown span{
+    font-family:'IBM Plex Mono',monospace; font-size:11px; padding:2px 7px;
+    background:var(--surface-raised); border-radius:3px; color:var(--text);
+  }
   .highlight-row td{ background:rgba(245,166,35,0.05); }
 
   footer{ margin-top:30px; color:var(--dimmer); font-size:11px; text-align:center; }
@@ -220,6 +241,64 @@ function parseProfile(name){
 
 function pct(n, d){ return d ? ((n/d)*100).toFixed(1) : "0.0"; }
 
+// Recognizes a non-first-hour session window inside a profile bracket segment,
+// e.g. "11AM-1PM HOD" -> {key:"11AM-1PM", label:"11:00 AM\u20131:00 PM"}.
+const OTHER_WINDOWS = [
+  { key: "11AM-1PM",  label: "11:00 AM\u20131:00 PM",  re: /11AM-\s*1PM/i },
+  { key: "1-2PM",     label: "1:00\u20132:00 PM",      re: /1-2\s*PM/i },
+  { key: "2:50-3:10", label: "2:50\u20133:10 PM",      re: /2:50-3:10/i },
+  { key: "3:30-4PM",  label: "3:30\u20134:00 PM",      re: /3:30-4\s*PM/i },
+  { key: "2:30-4PM",  label: "2:30\u20134:00 PM",      re: /2:30-4PM/i },
+];
+function findOtherWindow(seg){
+  for (const w of OTHER_WINDOWS) if (w.re.test(seg)) return w;
+  return null;
+}
+
+// Given a profile name like "[AM DR Low LOD]-[3:30-4PM HOD]", finds which
+// window the requested extreme (LOD or HOD) formed in. Returns "AM DR" for
+// the first hour, an OTHER_WINDOWS key otherwise, or "OTHER" if unrecognized.
+function extractWindowFor(profileName, wantLod){
+  const kw = wantLod ? "LOD" : "HOD";
+  const segs = [...profileName.matchAll(/\[([^\]]+)\]/g)].map(m => m[1]);
+  for (const seg of segs){
+    const s = seg.toUpperCase();
+    if (s.includes(kw)){
+      if (s.includes("AM DR") || s.includes("ADR")) return "AM DR";
+      const w = findOtherWindow(seg);
+      if (w) return w.key;
+    }
+  }
+  // Fallback for inconsistently-tagged profiles (e.g. "[2:30-4PM]-[HOD LOD]")
+  // where the window isn't attached directly to the HOD/LOD keyword.
+  for (const seg of segs){
+    const w = findOtherWindow(seg);
+    if (w) return w.key;
+  }
+  return "OTHER";
+}
+
+function windowLabel(key){
+  const found = OTHER_WINDOWS.find(w => w.key === key);
+  return found ? found.label : "an unspecified window";
+}
+
+// Breaks down, for a given direction and extreme (HOD/LOD), how many days it
+// formed in the first hour vs. which other window it formed in instead.
+function altWindowBreakdown(directionProfileCounts, direction, wantLod){
+  const counts = (directionProfileCounts && directionProfileCounts[direction]) || {};
+  let total = 0, firstHour = 0;
+  const other = {};
+  Object.entries(counts).forEach(([name, n]) => {
+    total += n;
+    const w = extractWindowFor(name, wantLod);
+    if (w === "AM DR") firstHour += n;
+    else other[w] = (other[w] || 0) + n;
+  });
+  const otherSorted = Object.entries(other).sort((a, b) => b[1] - a[1]);
+  return { total, firstHour, notFirstHour: total - firstHour, other: otherSorted };
+}
+
 async function render(){
   const app = document.getElementById('app');
   let stats;
@@ -234,7 +313,7 @@ async function render(){
   const {
     total_days, first_hour_hod_count, first_hour_lod_count, both_first_hour_count,
     profile_counts, direction_totals, direction_first_hour_hod, direction_first_hour_lod,
-    generated_at
+    direction_profile_counts, generated_at
   } = stats;
 
   // Aggregate window counts from profile_counts for the timeline
@@ -254,6 +333,9 @@ async function render(){
 
   const upLod = direction_first_hour_lod?.UPCLOSE || 0;
   const downHod = direction_first_hour_hod?.DOWNCLOSE || 0;
+
+  const upLodBreakdown = altWindowBreakdown(direction_profile_counts, "UPCLOSE", true);
+  const downHodBreakdown = altWindowBreakdown(direction_profile_counts, "DOWNCLOSE", false);
 
   app.innerHTML = `
     <header>
@@ -329,37 +411,73 @@ async function render(){
           <tr>
             <th>Direction</th>
             <th class="num">Days</th>
+            <th class="num">% of Days</th>
             <th class="num">HOD in 1st hr</th>
             <th class="num">LOD in 1st hr</th>
+            <th class="num">Notable %</th>
           </tr>
         </thead>
         <tbody>
           <tr class="highlight-row">
             <td class="dir-name up">UPCLOSE</td>
             <td class="num">${up}</td>
+            <td class="num pct-strong">${pct(up, total_days)}%</td>
             <td class="num">${direction_first_hour_hod?.UPCLOSE || 0} <span class="pct-bar"><i style="width:${pct(direction_first_hour_hod?.UPCLOSE||0, up)}%;background:var(--hod)"></i></span></td>
             <td class="num">${upLod} <span class="pct-bar"><i style="width:${pct(upLod, up)}%;background:var(--lod)"></i></span></td>
+            <td class="num pct-strong lod-strong">${pct(upLod, up)}%<div class="notable-lbl">LOD in 1st hr</div></td>
           </tr>
           <tr class="highlight-row">
             <td class="dir-name down">DOWNCLOSE</td>
             <td class="num">${down}</td>
+            <td class="num pct-strong">${pct(down, total_days)}%</td>
             <td class="num">${downHod} <span class="pct-bar"><i style="width:${pct(downHod, down)}%;background:var(--hod)"></i></span></td>
             <td class="num">${direction_first_hour_lod?.DOWNCLOSE || 0} <span class="pct-bar"><i style="width:${pct(direction_first_hour_lod?.DOWNCLOSE||0, down)}%;background:var(--lod)"></i></span></td>
+            <td class="num pct-strong hod-strong">${pct(downHod, down)}%<div class="notable-lbl">HOD in 1st hr</div></td>
           </tr>
           <tr>
             <td class="dir-name">BOTHWAYS</td>
             <td class="num">${both}</td>
+            <td class="num pct-strong">${pct(both, total_days)}%</td>
             <td class="num">${direction_first_hour_hod?.BOTHWAYS || 0}</td>
             <td class="num">${direction_first_hour_lod?.BOTHWAYS || 0}</td>
+            <td class="num">—</td>
           </tr>
           <tr>
             <td class="dir-name">SIDEWAYS</td>
             <td class="num">${side}</td>
+            <td class="num pct-strong">${pct(side, total_days)}%</td>
             <td class="num">${direction_first_hour_hod?.SIDEWAYS || 0}</td>
             <td class="num">${direction_first_hour_lod?.SIDEWAYS || 0}</td>
+            <td class="num">—</td>
           </tr>
         </tbody>
       </table>
+    </div>
+
+    <div class="insight-card">
+      <h3>When the primary extreme misses the first hour</h3>
+      <div class="insight-row">
+        <span class="tag up">UPCLOSE</span>
+        <p>
+          LOD forms in the first hour on <b>${pct(upLodBreakdown.firstHour, upLodBreakdown.total)}%</b> of UPCLOSE days
+          (${upLodBreakdown.firstHour}/${upLodBreakdown.total}). On the other
+          <b>${upLodBreakdown.notFirstHour}</b> days (${pct(upLodBreakdown.notFirstHour, upLodBreakdown.total)}%), the LOD instead forms during:
+          <span class="breakdown">
+            ${upLodBreakdown.other.map(([key, n]) => `<span>${windowLabel(key)}: ${n} (${pct(n, upLodBreakdown.notFirstHour)}%)</span>`).join('')}
+          </span>
+        </p>
+      </div>
+      <div class="insight-row">
+        <span class="tag down">DOWNCLOSE</span>
+        <p>
+          HOD forms in the first hour on <b>${pct(downHodBreakdown.firstHour, downHodBreakdown.total)}%</b> of DOWNCLOSE days
+          (${downHodBreakdown.firstHour}/${downHodBreakdown.total}). On the other
+          <b>${downHodBreakdown.notFirstHour}</b> days (${pct(downHodBreakdown.notFirstHour, downHodBreakdown.total)}%), the HOD instead forms during:
+          <span class="breakdown">
+            ${downHodBreakdown.other.map(([key, n]) => `<span>${windowLabel(key)}: ${n} (${pct(n, downHodBreakdown.notFirstHour)}%)</span>`).join('')}
+          </span>
+        </p>
+      </div>
     </div>
 
     <footer>
