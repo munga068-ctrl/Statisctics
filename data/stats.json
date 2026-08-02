@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-02T15:35:19.886671+00:00",
+  "generated_at": "2026-08-02T15:40:21.475658+00:00",
   "total_days": 198,
   "first_hour_hod_count": 82,
   "first_hour_lod_count": 107,
@@ -24,20 +24,20 @@
     "[1-2 PM LOD]-[3:30-4 PM HOD]": 1
   },
   "direction_totals": {
-    "SIDEWAYS": 31,
-    "UPCLOSE": 72,
+    "SIDEWAYS": 28,
+    "UPCLOSE": 73,
     "DOWNCLOSE": 66,
-    "BOTHWAYS": 29
+    "BOTHWAYS": 31
   },
   "direction_first_hour_hod": {
-    "SIDEWAYS": 14,
+    "SIDEWAYS": 13,
     "DOWNCLOSE": 58,
     "UPCLOSE": 2,
-    "BOTHWAYS": 8
+    "BOTHWAYS": 9
   },
   "direction_first_hour_lod": {
-    "SIDEWAYS": 18,
-    "UPCLOSE": 66,
+    "SIDEWAYS": 17,
+    "UPCLOSE": 67,
     "BOTHWAYS": 14,
     "DOWNCLOSE": 9
   }
