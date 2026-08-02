@@ -86,6 +86,17 @@
     display:flex; align-items:center; justify-content:center; transition:background .2s ease, border-color .2s ease;
   }
   #themeBtn:hover{ background:var(--surface-raised); }
+  #syncBtn{
+    border:1px solid var(--grid); background:var(--surface); border-radius:var(--radius);
+    height:32px; padding:0 12px; cursor:pointer; font-size:12px; color:var(--text);
+    display:flex; align-items:center; gap:6px; font-family:'IBM Plex Mono',monospace;
+    transition:background .2s ease, border-color .2s ease;
+  }
+  #syncBtn:hover{ background:var(--surface-raised); }
+  #syncBtn:disabled{ opacity:.6; cursor:default; }
+  #syncBtn .sync-icon{ font-size:13px; line-height:1; display:inline-block; }
+  #syncBtn .sync-icon.spin{ animation:sync-spin .8s linear infinite; }
+  @keyframes sync-spin{ from{transform:rotate(0deg);} to{transform:rotate(360deg);} }
 
   /* ---------- Sync status (top of page) ---------- */
   .status-line{ font-size:11px; margin:-18px 0 22px; font-family:'IBM Plex Mono',monospace; }
@@ -345,6 +356,9 @@ async function render(){
         <p class="sub">Where the day's high &amp; low actually form — vs. the 9:30–10:30 opening range</p>
       </div>
       <div class="header-right">
+        <button id="syncBtn" title="Re-fetch latest data" type="button">
+          <span class="sync-icon" id="syncIcon">⟳</span><span id="syncLabel">Sync</span>
+        </button>
         <button id="themeBtn" title="Toggle light/dark theme">🌙</button>
         <div class="meta">
           <span class="n">${total_days}</span>
@@ -387,11 +401,11 @@ async function render(){
     <div class="grid-cards">
       <div class="card">
         <div class="val gold">${first_hour_hod_count} <span style="font-size:14px;color:var(--dim)">/ ${total_days}</span></div>
-        <div class="label">Days the HOD formed in the first hour (${pct(first_hour_hod_count, total_days)}%)</div>
+        <div class="label">Days the HOD formed in the first hour (<b class="pct-strong">${pct(first_hour_hod_count, total_days)}%</b>)</div>
       </div>
       <div class="card">
         <div class="val cyan">${first_hour_lod_count} <span style="font-size:14px;color:var(--dim)">/ ${total_days}</span></div>
-        <div class="label">Days the LOD formed in the first hour (${pct(first_hour_lod_count, total_days)}%)</div>
+        <div class="label">Days the LOD formed in the first hour (<b class="pct-strong">${pct(first_hour_lod_count, total_days)}%</b>)</div>
       </div>
       <div class="card">
         <div class="val">${both_first_hour_count}</div>
@@ -488,6 +502,7 @@ async function render(){
 
   setupStatusLine(generated_at);
   setupThemeToggle();
+  setupSyncButton();
 }
 
 // ---------- Sync status (top of page), mirrors the Daily Summary dashboard ----------
@@ -529,6 +544,37 @@ function setupStatusLine(generatedAt){
 // in <head> so the correct theme is applied before first paint (no flash).
 // Shares the 'mmtrades-theme' localStorage key with the Daily Summary
 // dashboard, so switching on one page keeps the other in sync.
+// ---------- Sync button ----------
+// Re-fetches data/stats.json (bypassing cache) and re-renders — same pattern
+// as the Sync button on the Playbook dashboard's Framework Ledger page.
+function setupSyncButton(){
+  const syncBtn = document.getElementById('syncBtn');
+  const syncIcon = document.getElementById('syncIcon');
+  const syncLabel = document.getElementById('syncLabel');
+  if (!syncBtn) return;
+
+  syncBtn.addEventListener('click', () => {
+    syncBtn.disabled = true;
+    syncIcon.classList.add('spin');
+    syncLabel.textContent = 'Syncing…';
+    render()
+      .then(() => {
+        const label = document.getElementById('syncLabel');
+        if (label) label.textContent = 'Synced';
+      })
+      .catch(() => {
+        const label = document.getElementById('syncLabel');
+        if (label) label.textContent = 'Retry';
+      })
+      .finally(() => {
+        setTimeout(() => {
+          const label = document.getElementById('syncLabel');
+          if (label) label.textContent = 'Sync';
+        }, 2000);
+      });
+  });
+}
+
 function setupThemeToggle(){
   const themeBtn = document.getElementById('themeBtn');
   if (!themeBtn) return;
