@@ -88,6 +88,7 @@ def main():
     direction_totals = {}
     direction_first_hour_hod = {}
     direction_first_hour_lod = {}
+    direction_profile_counts = {}
 
     for page in log_pages:
         props = page["properties"]
@@ -120,6 +121,10 @@ def main():
                 direction_first_hour_hod[d] = direction_first_hour_hod.get(d, 0) + 1
             if is_lod_first_hour:
                 direction_first_hour_lod[d] = direction_first_hour_lod.get(d, 0) + 1
+            # Per-direction profile breakdown, used to show which session window
+            # HOD/LOD form in on the days they *don't* land in the first hour.
+            bucket = direction_profile_counts.setdefault(d, {})
+            bucket[profile_name] = bucket.get(profile_name, 0) + 1
 
     stats = {
         "generated_at": datetime.now(timezone.utc).isoformat(),
@@ -133,6 +138,7 @@ def main():
         "direction_totals": direction_totals,
         "direction_first_hour_hod": direction_first_hour_hod,
         "direction_first_hour_lod": direction_first_hour_lod,
+        "direction_profile_counts": direction_profile_counts,
     }
 
     os.makedirs("data", exist_ok=True)
