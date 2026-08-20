@@ -1,16 +1,16 @@
 {
-  "generated_at": "2026-08-20T04:15:20.970626+00:00",
-  "total_days": 210,
-  "first_hour_hod_count": 88,
-  "first_hour_lod_count": 113,
-  "both_first_hour_count": 18,
+  "generated_at": "2026-08-20T04:20:17.009409+00:00",
+  "total_days": 211,
+  "first_hour_hod_count": 89,
+  "first_hour_lod_count": 114,
+  "both_first_hour_count": 19,
   "profile_counts": {
     "[AM DR Low LOD]-[3:30-4PM HOD]": 31,
     "[AM DR Low LOD]-[11AM-1PM HOD]": 30,
     "[AM DR High HOD]-[11AM-1PM LOD] ": 26,
     "[AM DR High HOD]-[3:30-4PM LOD]": 25,
+    "[AM ADR High HOD]-[AM ADR Low LOD]": 19,
     "[AM DR Low LOD]-[1-2 PM HOD] ": 19,
-    "[AM ADR High HOD]-[AM ADR Low LOD]": 18,
     "[AM DR Low LOD]-[2:50-3:10 HOD]": 15,
     "[AM DR High HOD]-[1-2 PM LOD]": 13,
     "[11AM-1PM LOD]-[3:30-4PM HOD]": 8,
@@ -24,29 +24,29 @@
     "[1-2 PM LOD]-[3:30-4 PM HOD]": 1
   },
   "direction_totals": {
-    "DOWNCLOSE": 80,
+    "DOWNCLOSE": 81,
     "UPCLOSE": 82,
     "BOTHWAYS": 27,
     "SIDEWAYS": 21
   },
   "direction_first_hour_hod": {
-    "DOWNCLOSE": 71,
+    "DOWNCLOSE": 72,
     "SIDEWAYS": 10,
     "UPCLOSE": 2,
     "BOTHWAYS": 5
   },
   "direction_first_hour_lod": {
+    "DOWNCLOSE": 14,
     "UPCLOSE": 75,
-    "DOWNCLOSE": 13,
     "BOTHWAYS": 13,
     "SIDEWAYS": 12
   },
   "direction_profile_counts": {
     "DOWNCLOSE": {
+      "[AM ADR High HOD]-[AM ADR Low LOD]": 14,
       "[AM DR High HOD]-[11AM-1PM LOD] ": 19,
       "[11AM-1PM HOD]-[3:30-4PM LOD]": 5,
       "[AM DR High HOD]-[2:50-3:10 LOD]": 4,
-      "[AM ADR High HOD]-[AM ADR Low LOD]": 13,
       "[AM DR High HOD]-[3:30-4PM LOD]": 25,
       "[2:30-4PM]-[HOD LOD]": 1,
       "[11AM-1PM HOD]-[2:50-3:10 LOD]": 2,
