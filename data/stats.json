@@ -1,11 +1,11 @@
 {
-  "generated_at": "2026-08-31T21:10:19.676515+00:00",
-  "total_days": 218,
+  "generated_at": "2026-08-31T21:15:19.175327+00:00",
+  "total_days": 219,
   "first_hour_hod_count": 92,
-  "first_hour_lod_count": 119,
+  "first_hour_lod_count": 120,
   "both_first_hour_count": 21,
   "profile_counts": {
-    "[AM DR Low LOD]-[3:30-4PM HOD]": 32,
+    "[AM DR Low LOD]-[3:30-4PM HOD]": 33,
     "[AM DR Low LOD]-[11AM-1PM HOD]": 31,
     "[AM DR High HOD]-[11AM-1PM LOD] ": 26,
     "[AM DR High HOD]-[3:30-4PM LOD]": 25,
@@ -24,9 +24,9 @@
     "[1-2 PM LOD]-[3:30-4 PM HOD]": 1
   },
   "direction_totals": {
+    "SIDEWAYS": 24,
     "BOTHWAYS": 29,
     "UPCLOSE": 84,
-    "SIDEWAYS": 23,
     "DOWNCLOSE": 82
   },
   "direction_first_hour_hod": {
@@ -36,12 +36,22 @@
     "BOTHWAYS": 5
   },
   "direction_first_hour_lod": {
+    "SIDEWAYS": 14,
     "UPCLOSE": 77,
-    "SIDEWAYS": 13,
     "DOWNCLOSE": 15,
     "BOTHWAYS": 14
   },
   "direction_profile_counts": {
+    "SIDEWAYS": {
+      "[AM DR Low LOD]-[3:30-4PM HOD]": 4,
+      "[AM ADR High HOD]-[AM ADR Low LOD]": 4,
+      "[AM DR High HOD]-[1-2 PM LOD]": 3,
+      "[AM DR High HOD]-[11AM-1PM LOD] ": 4,
+      "[AM DR High HOD]-[2:50-3:10 LOD]": 1,
+      "[AM DR Low LOD]-[11AM-1PM HOD]": 6,
+      "[11AM-1PM LOD]-[2:50-3:10 HOD]": 1,
+      "[1-2 PM LOD]-[3:30-4 PM HOD]": 1
+    },
     "BOTHWAYS": {
       "[11AM-1PM HOD]-[1-2PM LOD]": 3,
       "[AM DR Low LOD]-[11AM-1PM HOD]": 8,
@@ -64,16 +74,6 @@
       "[11AM-1PM LOD]-[3:30-4PM HOD]": 6,
       "[AM ADR High HOD]-[AM ADR Low LOD]": 2,
       "[11AM-1PM LOD]-[2:50-3:10 HOD]": 1
-    },
-    "SIDEWAYS": {
-      "[AM ADR High HOD]-[AM ADR Low LOD]": 4,
-      "[AM DR High HOD]-[1-2 PM LOD]": 3,
-      "[AM DR High HOD]-[11AM-1PM LOD] ": 4,
-      "[AM DR High HOD]-[2:50-3:10 LOD]": 1,
-      "[AM DR Low LOD]-[11AM-1PM HOD]": 6,
-      "[AM DR Low LOD]-[3:30-4PM HOD]": 3,
-      "[11AM-1PM LOD]-[2:50-3:10 HOD]": 1,
-      "[1-2 PM LOD]-[3:30-4 PM HOD]": 1
     },
     "DOWNCLOSE": {
       "[AM ADR High HOD]-[AM ADR Low LOD]": 15,
