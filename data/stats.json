@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-09-17T06:45:24.874966+00:00",
-  "total_days": 229,
+  "generated_at": "2026-09-17T06:50:17.575630+00:00",
+  "total_days": 230,
   "first_hour_hod_count": 98,
   "first_hour_lod_count": 125,
   "both_first_hour_count": 24,
@@ -14,7 +14,7 @@
     "[AM DR Low LOD]-[2:50-3:10 HOD]": 16,
     "[AM DR High HOD]-[1-2 PM LOD]": 15,
     "[11AM-1PM LOD]-[3:30-4PM HOD]": 8,
-    "[11AM-1PM HOD]-[3:30-4PM LOD]": 6,
+    "[11AM-1PM HOD]-[3:30-4PM LOD]": 7,
     "[AM DR High HOD]-[2:50-3:10 LOD]": 6,
     "[11AM-1PM HOD]-[11AM-1PM LOD]": 4,
     "[11AM-1PM HOD]-[2:50-3:10 LOD]": 4,
@@ -24,6 +24,7 @@
     "[1-2 PM LOD]-[3:30-4 PM HOD]": 1
   },
   "direction_totals": {
+    "Unknown": 1,
     "DOWNCLOSE": 85,
     "UPCLOSE": 87,
     "SIDEWAYS": 26,
@@ -42,6 +43,9 @@
     "BOTHWAYS": 14
   },
   "direction_profile_counts": {
+    "Unknown": {
+      "[11AM-1PM HOD]-[3:30-4PM LOD]": 1
+    },
     "DOWNCLOSE": {
       "[AM DR High HOD]-[3:30-4PM LOD]": 26,
       "[AM ADR High HOD]-[AM ADR Low LOD]": 16,
