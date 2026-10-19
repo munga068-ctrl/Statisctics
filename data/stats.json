@@ -1,12 +1,12 @@
 {
-  "generated_at": "2026-10-19T22:30:22.796881+00:00",
-  "total_days": 251,
+  "generated_at": "2026-10-19T22:35:17.276536+00:00",
+  "total_days": 252,
   "first_hour_hod_count": 107,
-  "first_hour_lod_count": 138,
+  "first_hour_lod_count": 139,
   "both_first_hour_count": 28,
   "profile_counts": {
     "[AM DR Low LOD]-[3:30-4PM HOD]": 39,
-    "[AM DR Low LOD]-[11AM-1PM HOD]": 33,
+    "[AM DR Low LOD]-[11AM-1PM HOD]": 34,
     "[AM DR High HOD]-[11AM-1PM LOD] ": 29,
     "[AM ADR High HOD]-[AM ADR Low LOD]": 28,
     "[AM DR High HOD]-[3:30-4PM LOD]": 26,
@@ -25,10 +25,10 @@
     "[1-2 PM LOD]-[3:30-4 PM HOD]": 1
   },
   "direction_totals": {
+    "BOTHWAYS": 35,
     "DOWNCLOSE": 92,
     "UPCLOSE": 94,
-    "SIDEWAYS": 31,
-    "BOTHWAYS": 34
+    "SIDEWAYS": 31
   },
   "direction_first_hour_hod": {
     "DOWNCLOSE": 83,
@@ -37,12 +37,26 @@
     "UPCLOSE": 3
   },
   "direction_first_hour_lod": {
+    "BOTHWAYS": 17,
     "UPCLOSE": 86,
     "SIDEWAYS": 18,
-    "BOTHWAYS": 16,
     "DOWNCLOSE": 18
   },
   "direction_profile_counts": {
+    "BOTHWAYS": {
+      "[AM DR Low LOD]-[11AM-1PM HOD]": 11,
+      "[11AM-1PM HOD]-[3:30-4PM LOD]": 2,
+      "[AM DR High HOD]-[11AM-1PM LOD] ": 4,
+      "[11AM-1PM HOD]-[2:50-3:10 LOD]": 2,
+      "[11AM-1PM HOD]-[1-2PM LOD]": 3,
+      "[AM DR Low LOD]-[1-2 PM HOD] ": 5,
+      "[AM DR High HOD]-[1-2 PM LOD]": 1,
+      "[AM DR Low LOD]-[3:30-4PM HOD]": 1,
+      "[11AM-1PM HOD]-[11AM-1PM LOD]": 2,
+      "[11AM-1PM LOD]-[3:30-4PM HOD]": 2,
+      "[11AM-1PM LOD]-[2:50-3:10 HOD]": 1,
+      "[AM DR High HOD]-[2:50-3:10 LOD]": 1
+    },
     "DOWNCLOSE": {
       "[AM DR High HOD]-[2:50-3:10 LOD]": 6,
       "[AM DR High HOD]-[1-2 PM LOD]": 12,
@@ -75,20 +89,6 @@
       "[AM DR Low LOD]-[11AM-1PM HOD]": 6,
       "[11AM-1PM LOD]-[2:50-3:10 HOD]": 1,
       "[1-2 PM LOD]-[3:30-4 PM HOD]": 1
-    },
-    "BOTHWAYS": {
-      "[AM DR Low LOD]-[11AM-1PM HOD]": 10,
-      "[11AM-1PM HOD]-[3:30-4PM LOD]": 2,
-      "[AM DR High HOD]-[11AM-1PM LOD] ": 4,
-      "[11AM-1PM HOD]-[2:50-3:10 LOD]": 2,
-      "[11AM-1PM HOD]-[1-2PM LOD]": 3,
-      "[AM DR Low LOD]-[1-2 PM HOD] ": 5,
-      "[AM DR High HOD]-[1-2 PM LOD]": 1,
-      "[AM DR Low LOD]-[3:30-4PM HOD]": 1,
-      "[11AM-1PM HOD]-[11AM-1PM LOD]": 2,
-      "[11AM-1PM LOD]-[3:30-4PM HOD]": 2,
-      "[11AM-1PM LOD]-[2:50-3:10 HOD]": 1,
-      "[AM DR High HOD]-[2:50-3:10 LOD]": 1
     }
   }
 }
